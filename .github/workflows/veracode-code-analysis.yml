@@ -58,7 +58,7 @@ jobs:
     steps:
       - name: Verify Veracode API credentials
         id: verify_api_creds
-        uses: veracode/github-actions-integration-helper@feature/DXS-124
+        uses: veracode/github-actions-integration-helper@v0.1.0
         with:
           action: validateVeracodeApiCreds
           token: ${{ github.event.client_payload.token }}
@@ -71,7 +71,7 @@ jobs:
       - name: Verify Policy name
         id: verify_policy_name
         if: success()
-        uses: veracode/github-actions-integration-helper@feature/DXS-124
+        uses: veracode/github-actions-integration-helper@v0.1.0
         with:
           action: validatePolicyName
           token: ${{ github.event.client_payload.token }}
@@ -84,7 +84,7 @@ jobs:
           path: ${{ github.event.client_payload.annotationObj.path }}
           start_line: ${{ github.event.client_payload.annotationObj.start_line }}
           end_line: ${{ github.event.client_payload.annotationObj.end_line }}
-          break_build_policy_findings: ${{github.event.client_payload.break_build_policy_findings }}
+          break_build_invalid_policy: ${{github.event.client_payload.break_build_invalid_policy }}
  
   build:
     needs: validations
@@ -103,7 +103,7 @@ jobs:
     uses: ./.github/workflows/veracode-pipeline-scan.yml
     with:
       policy_name: ${{ github.event.client_payload.policy_name }}
-      security_report_enabled: ${{ github.event.client_payload.user_config.security_report_enabled }}
+      create_code_scanning_alert: ${{ github.event.client_payload.user_config.create_code_scanning_alert }}
       owner: ${{ github.event.client_payload.repository.owner }}
       repo: ${{ github.event.client_payload.repository.name }}
       sha: ${{ github.event.client_payload.sha }}
@@ -126,7 +126,7 @@ jobs:
       token: ${{ github.event.client_payload.token }}
       ref: ${{ github.event.client_payload.user_config.ref }}
       create_issue: ${{ github.event.client_payload.user_config.create_issue }}
-      security_report_enabled: ${{ github.event.client_payload.user_config.security_report_enabled }}
+      create_code_scanning_alert: ${{ github.event.client_payload.user_config.create_code_scanning_alert }}
     secrets: inherit
 
   sandbox_scan:
@@ -134,7 +134,7 @@ jobs:
     if: contains(github.event.action, 'sandbox')
     uses: ./.github/workflows/veracode-sandbox-scan.yml
     with:
-      profile_name: ${{ github.event.client_payload.profile_name }}
+      profile_name: ${{ github.event.client_payload.user_config.profile_name }}
       policy_name: ${{ github.event.client_payload.policy_name }}
       branch: ${{ github.event.client_payload.repository.branch }}
       modules_to_scan: ${{ github.event.client_payload.modules_to_scan }}
